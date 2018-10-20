@@ -69,8 +69,8 @@ void LogWindow::on_pushButton_clicked()     //响应登录按钮的槽函数
     //账号存在且密码正确，则进入主界面
 //    qDebug()<<"登录成功";
     emit(this->close());    //关闭登录窗口
-    _main=new MainWindow;
-    _main->showmain(ui->lineEdit->text());   //将用户姓名传递到主界面
+    UIDemo08 w;
+    w.show();
 }
 
 void LogWindow::on_pushButton_2_clicked()
