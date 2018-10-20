@@ -11,7 +11,9 @@ LogWindow::LogWindow(QWidget *parent) :
     ui(new Ui::LogWindow)
 {
     ui->setupUi(this);
-    ui->label_3->setPixmap(QPixmap(":/jpg/bbb.jpg"));   //添加资源文件
+    ui->label_3->setPixmap(QPixmap(":/png/log.png"));   //添加资源文件
+
+//    connect(this,SIGNAL(close()),mainwindow,SLOT(showmain()));
 }
 
 LogWindow::~LogWindow()
@@ -69,8 +71,8 @@ void LogWindow::on_pushButton_clicked()     //响应登录按钮的槽函数
     //账号存在且密码正确，则进入主界面
 //    qDebug()<<"登录成功";
     emit(this->close());    //关闭登录窗口
-    UIDemo08 w;
-    w.show();
+    mainwindow=new UIDemo08;
+    mainwindow->showmain(ui->lineEdit->text());
 }
 
 void LogWindow::on_pushButton_2_clicked()

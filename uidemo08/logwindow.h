@@ -14,6 +14,7 @@ class LogWindow : public QWidget
 public:
     explicit LogWindow(QWidget *parent = nullptr);
     ~LogWindow();
+    UIDemo08* mainwindow;
 private slots:
     void on_pushButton_clicked();   //点击登录框的槽函数
 

@@ -17,13 +17,15 @@ OBJECTS_DIR = temp/obj
 DESTDIR     = $$PWD/../bin
 
 SOURCES     += main.cpp \
-    logwindow.cpp
+    logwindow.cpp \
+
 SOURCES     += iconhelper.cpp
 SOURCES     += appinit.cpp
 SOURCES     += uidemo08.cpp
 
 HEADERS     += iconhelper.h \
-    logwindow.h
+    logwindow.h \
+
 HEADERS     += appinit.h
 HEADERS     += uidemo08.h
 
@@ -31,7 +33,7 @@ FORMS       += uidemo08.ui \
     logwindow.ui
 
 RESOURCES   += main.qrc \
-    main1.qrc
+    log.qrc
 RESOURCES   += qss.qrc
 CONFIG      += qt warn_off
 INCLUDEPATH += $$PWD

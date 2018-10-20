@@ -1,6 +1,5 @@
 <RCC>
-    <qresource prefix="/jpg"/>
-    <qresource prefix="/">
+    <qresource prefix="/png">
         <file>log.png</file>
     </qresource>
 </RCC>
