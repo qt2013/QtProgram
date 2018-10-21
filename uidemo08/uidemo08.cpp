@@ -86,7 +86,6 @@ void UIDemo08::buttonClick()    //设置菜单按钮的槽函数
     //根据按下的按钮来切换到相应的堆栈窗口
     if (name == "兵器知识") {
         ui->stackedWidget->setCurrentIndex(0);
-        setFocus();
         do_page1();
     } else if (name == "舰船战机") {
         ui->stackedWidget->setCurrentIndex(1);
@@ -139,25 +138,29 @@ void UIDemo08::do_page1()   //设置兵器界面的内容
     QHBoxLayout* hlayout=new QHBoxLayout;
     vlayout->addLayout(hlayout);
     //添加查找框
-    QPushButton* button;
+    QPushButton* button=new QPushButton(search_1);
+    button->setText("点击查询");
     hlayout->addWidget(filter=new QLineEdit);
-    hlayout->addWidget(button=new QPushButton("点击查询"));
-    filter->setFont(QFont("Microsoft Yahei" , 28 ,  QFont::Black));
+    hlayout->addWidget(button);
+    //设置filter样式
+    filter->setStyleSheet("QLineEdit{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid gray;}"
+            "QLineEdit:hover{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid rgb(70,200,50);}");
     //鼠标点击时查询数据库
-    connect(button,&QPushButton::clicked,[&](bool)
-    {
-        qDebug()<<"clicked";
-    });
+    connect(button,SIGNAL(clicked(bool)),this,SLOT(slotshowresult(bool)));
+    //设置过滤器，当filter中的编辑数据变化时，view显示包含edit中的数据的行
+    connect(filter,SIGNAL(textChanged(const QString &)),this,SLOT(slottextChanged(const QString &)));
     //设置样式
-//    button->setStyleSheet("QPushButton{color:red;background:yellow}");
-//    QFont* font=new QFont("QFont{color:red;}");
-//    filter->setFont(*font);
+    button->setStyleSheet("QPushButton{color:red;background:yellow}");
     //加载数据库模型
     _model=new QSqlQueryModel;
     _model->setQuery("select * from weapon;");
     QSqlQuery query=_model->query();
     _view=new QTableView;
     _view->setModel(_model);
+    //设置点击表格的消息槽函数
+    connect(_view,&QTableView::clicked,this,[&](const QModelIndex &index){
+        slotclickview(index);
+    });
     //获取要显示的数据的列坐标
     int index_name=query.record().indexOf("name");
     int index_country=query.record().indexOf("country");
@@ -179,8 +182,6 @@ void UIDemo08::do_page1()   //设置兵器界面的内容
 
     //设置显示界面相关显示
     QHBoxLayout* hlayout_2=new QHBoxLayout(show_1);
-    QTextEdit* html_1;      //介绍页面的html文本显示框
-    QTextEdit* html_2;      //格子页面的html文本显示框
     hlayout_2->addWidget(html_1=new QTextEdit,2);
     hlayout_2->addWidget(html_2=new QTextEdit,1);
     html_1->setBackgroundRole(QPalette::ColorRole::Text);
@@ -212,19 +213,50 @@ void UIDemo08::slotshowresult(bool)     //兵器查询页面点击查询按钮�
     if(filter_text.isEmpty())
     {
         QMessageBox::warning(nullptr,"warn","输入的查询内容为空");
+        _model->setQuery("select * from weapon;");
+        _model->query();
+        return;
     }
     //更新数据库，显示查询内容
     QSqlRecord record=_model->record();
     QString queryfilter;
     //拼凑查询内容
-    for(int i=0;i<record.count();i++)
-    {
-        if(i!=0) queryfilter+=" or ";
-        QString field=record.fieldName(i);
-        QString subfilter=QString().sprintf("%s like '%%%s%%'",field.toUtf8().data(),filter_text.toUtf8().data());
-        queryfilter+=subfilter;
-    }
-    qDebug()<<queryfilter;
+    QString subfilter=QString().sprintf("name like '%%%s%%' or country like '%%%s%%' or kind like '%%%s%%'",filter_text.toUtf8().data(),filter_text.toUtf8().data(),filter_text.toUtf8().data());
+    queryfilter="select name,country,kind from weapon where "+subfilter;
+    qDebug()<<subfilter;
     _model->setQuery(queryfilter);
-    _model->query();
+    QSqlQuery result=_model->query();
+    //如果查询结果为空，则发出提示,同时跟新数据库视图
+    qDebug()<<result.size();
+    if(result.size()==0)
+    {
+        QMessageBox::warning(nullptr,"warn","未查找到,请重新输入");
+        _model->setQuery("select * from weapon;");
+        _model->query();
+        return;
+    }
+}
+void UIDemo08::slottextChanged(const QString &filter)   //filter内容改变时的槽函数
+{
+    if(filter.isEmpty())
+    {
+        _model->setQuery("select* from weapon;");
+        _model->query();
+        return;
+    }
+    QSqlRecord record=_model->record();
+    QString queryfilter;
+    //拼凑查询内容
+    QString subfilter=QString().sprintf("name like '%%%s%%' or country like '%%%s%%' or kind like '%%%s%%'",filter.toUtf8().data(),filter.toUtf8().data(),filter.toUtf8().data());
+    queryfilter="select name,country,kind from weapon where "+subfilter;
+    qDebug()<<subfilter;
+    _model->setQuery(queryfilter);
+    QSqlQuery result=_model->query();
+}
+void UIDemo08::slotclickview(const QModelIndex &index)  //设置兵器页面的点击view中单元格的槽函数
+{
+            _introduce=_model->record(index.row()).value(0).toString();
+            _html=_model->record(index.row()).value(1).toString();
+            qDebug()<<_introduce;
+            qDebug()<<_html;
 }

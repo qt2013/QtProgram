@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QSqlQueryModel>
 #include <QTableView>
+#include <QTextEdit>
 class QToolButton;
 
 namespace Ui {
@@ -43,12 +44,18 @@ private:
     void do_page4();    //进入军事论坛显示界面
 
     QLineEdit* filter;  //兵器页面查询框
+    QTextEdit* html_1;      //介绍兵器页面的html文本显示框
+    QTextEdit* html_2;      //兵器界面格子页面的html文本显示框
     QSqlQueryModel* _model;
     QTableView* _view;
+    QString _introduce;    //暂存兵器界面的查询结果中的兵器介绍文本
+    QString _html;    //暂存兵器界面的查询结果中的html文本
 private slots:
     void initForm();
     void buttonClick();
     void slotshowresult(bool);
+    void slottextChanged(const QString &);
+    void slotclickview(const QModelIndex &index);
 private slots:
     void on_btnMenu_Min_clicked();
     void on_btnMenu_Max_clicked();
