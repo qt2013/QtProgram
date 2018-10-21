@@ -186,6 +186,11 @@ void UIDemo08::do_page1()   //设置兵器界面的内容
     hlayout_2->addWidget(html_2=new QTextEdit,1);
     html_1->setBackgroundRole(QPalette::ColorRole::Text);
     html_2->setBackgroundRole(QPalette::ColorRole::Light);
+    //将显示界面设置为不可编辑
+    html_1->setFocusPolicy(Qt::NoFocus);
+    html_2->setFocusPolicy(Qt::NoFocus);
+    //设置信号槽显示查询结果
+    connect(this,SIGNAL(showresult_1()),this,SLOT(slotshowresult_1()));
 }
 void UIDemo08::do_page2()  //进入舰船战机显示界面
 {
@@ -255,8 +260,15 @@ void UIDemo08::slottextChanged(const QString &filter)   //filter内容改变时�
 }
 void UIDemo08::slotclickview(const QModelIndex &index)  //设置兵器页面的点击view中单元格的槽函数
 {
-            _introduce=_model->record(index.row()).value(0).toString();
-            _html=_model->record(index.row()).value(1).toString();
-            qDebug()<<_introduce;
-            qDebug()<<_html;
+    _introduce=_model->record(index.row()).value(4).toString();
+    _html=_model->record(index.row()).value(5).toString();
+    qDebug()<<_introduce;
+    qDebug()<<_html;
+    //刷新显示界面
+    emit(showresult_1());
+}
+void UIDemo08::slotshowresult_1()   //设置兵器界面的结果显示的槽函数
+{
+    html_1->setText(_introduce);
+    html_2->setText(_html);
 }

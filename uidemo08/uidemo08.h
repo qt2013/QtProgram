@@ -50,12 +50,15 @@ private:
     QTableView* _view;
     QString _introduce;    //暂存兵器界面的查询结果中的兵器介绍文本
     QString _html;    //暂存兵器界面的查询结果中的html文本
+signals:
+    void showresult_1();  //设置显示兵器界面查询结果的信号函数
 private slots:
     void initForm();
     void buttonClick();
     void slotshowresult(bool);
     void slottextChanged(const QString &);
     void slotclickview(const QModelIndex &index);
+    void slotshowresult_1();
 private slots:
     void on_btnMenu_Min_clicked();
     void on_btnMenu_Max_clicked();
