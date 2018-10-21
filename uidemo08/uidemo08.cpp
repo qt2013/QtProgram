@@ -4,14 +4,21 @@
 #include "ui_uidemo08.h"
 #include "iconhelper.h"
 #include <QLabel>
+#include <QColor>
+#include <QSqlQueryModel>
+#include <QSqlRecord>
+#include <QSqlQuery>
+#include <QTableView>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QMessageBox>
+
 UIDemo08::UIDemo08(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::UIDemo08)
 {
     ui->setupUi(this);
     this->initForm();   //初始化窗口
-    this->initLeftMain();   //初始化兵器知识页面左侧按钮
-    this->initLeftConfig(); //初始化舰船战机页面左侧按钮
     this->setGeometry(200,20,1400,1000);    //设置初始化窗口大小
 }
 
@@ -42,10 +49,6 @@ void UIDemo08::initForm()
     ui->labTitle->setFont(QFont("Microsoft Yahei", 20));
     this->setWindowTitle(ui->labTitle->text());
 
-    QString welcome_str="welcome "+name;
-    ui->label->setText(welcome_str);
-    ui->label->setFont(QFont("Microsoft Yahei", 10));
-
     ui->stackedWidget->setStyleSheet("QLabel{font:60pt;}");
 
     QSize icoSize(32, 32);
@@ -62,8 +65,6 @@ void UIDemo08::initForm()
 
     ui->btnMain->click();
 
-    ui->widgetLeftMain->setProperty("flag", "left");
-    ui->widgetLeftConfig->setProperty("flag", "left");
     ui->page1->setStyleSheet(QString("QWidget[flag=\"left\"] QAbstractButton{min-height:%1px;max-height:%1px;}").arg(60));
     ui->page2->setStyleSheet(QString("QWidget[flag=\"left\"] QAbstractButton{min-height:%1px;max-height:%1px;}").arg(20));
 }
@@ -85,109 +86,20 @@ void UIDemo08::buttonClick()    //设置菜单按钮的槽函数
     //根据按下的按钮来切换到相应的堆栈窗口
     if (name == "兵器知识") {
         ui->stackedWidget->setCurrentIndex(0);
+        setFocus();
+        do_page1();
     } else if (name == "舰船战机") {
         ui->stackedWidget->setCurrentIndex(1);
+        do_page2();
     } else if (name == "战史战例") {
         ui->stackedWidget->setCurrentIndex(2);
+        do_page3();
     } else if (name == "军事论坛") {
         ui->stackedWidget->setCurrentIndex(3);
+        do_page4();
     } else if (name == "用户退出") {
         exit(0);
     }
-}
-
-void UIDemo08::initLeftMain()
-{
-    //将按钮的索引和按钮本身装进列表，方便后继调用
-    pixCharMain << 0xf030 << 0xf03e << 0xf247;
-    btnsMain << ui->tbtnMain1 << ui->tbtnMain2 << ui->tbtnMain3;
-    //初始化个按钮的属性和样式
-    int count = btnsMain.count();
-    for (int i = 0; i < count; i++) {
-        btnsMain.at(i)->setCheckable(true);
-        btnsMain.at(i)->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        connect(btnsMain.at(i), SIGNAL(clicked(bool)), this, SLOT(leftMainClick()));
-    }
-
-    IconHelper::Instance()->setStyle(ui->widgetLeftMain, btnsMain, pixCharMain, 15, 35, 25, "left", 4);
-    //将页面显示在第一页
-    ui->tbtnMain1->click();
-}
-
-void UIDemo08::initLeftConfig()
-{
-     //将按钮的索引和按钮本身装进列表，方便后继调用
-    pixCharConfig << 0xf031 << 0xf036 << 0xf249 << 0xf055 << 0xf05a << 0xf249;
-    btnsConfig << ui->tbtnConfig1 << ui->tbtnConfig2 << ui->tbtnConfig3 << ui->tbtnConfig4 << ui->tbtnConfig5 << ui->tbtnConfig6;
-    //初始化个按钮的属性和样式
-    int count = btnsConfig.count();
-    for (int i = 0; i < count; i++) {
-        btnsConfig.at(i)->setCheckable(true);
-        btnsConfig.at(i)->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        connect(btnsConfig.at(i), SIGNAL(clicked(bool)), this, SLOT(leftConfigClick()));
-    }
-
-    IconHelper::Instance()->setStyle(ui->widgetLeftConfig, btnsConfig, pixCharConfig, 10, 20, 15, "left", 5);
-     //将页面显示在第一页
-    ui->tbtnConfig1->click();
-}
-
-void UIDemo08::leftMainClick()  //兵器知识页面左侧按钮的槽函数
-{
-    QToolButton *b = (QToolButton *)sender();
-    QString name = b->text();
-
-    int count = btnsMain.count();
-    for (int i = 0; i < count; i++) {
-        if (btnsMain.at(i) == b) {
-            btnsMain.at(i)->setChecked(true);
-            btnsMain.at(i)->setIcon(QIcon(IconHelper::Instance()->getPixmap(btnsMain.at(i), false)));
-        } else {
-            btnsMain.at(i)->setChecked(false);
-            btnsMain.at(i)->setIcon(QIcon(IconHelper::Instance()->getPixmap(btnsMain.at(i), true)));
-        }
-    }
-    //根据按钮的名称来绘制相应的widget
-    if(name=="轻兵器类")
-    {
-        qDebug()<<name;
-        ui->stackedWidget_2->setCurrentWidget(ui->page);
-        QVBoxLayout* layout=new QVBoxLayout(ui->page);
-        layout->addWidget(new QLabel(name));
-    }
-    else if(name=="重兵器类")
-    {
-        qDebug()<<name;
-        ui->stackedWidget_2->setCurrentWidget(ui->page_2);
-        QVBoxLayout* layout=new QVBoxLayout(ui->page_2);
-        layout->addWidget(new QLabel(name));
-    }
-    else
-    {
-        qDebug()<<name;
-        ui->stackedWidget_2->setCurrentWidget(ui->page_3);
-        QVBoxLayout* layout=new QVBoxLayout(ui->page_3);
-        layout->addWidget(new QLabel(name));
-    }
-}
-
-void UIDemo08::leftConfigClick()
-{
-    QToolButton *b = (QToolButton *)sender();
-    QString name = b->text();
-
-    int count = btnsConfig.count();
-    for (int i = 0; i < count; i++) {
-        if (btnsConfig.at(i) == b) {
-            btnsConfig.at(i)->setChecked(true);
-            btnsConfig.at(i)->setIcon(QIcon(IconHelper::Instance()->getPixmap(btnsConfig.at(i), false)));
-        } else {
-            btnsConfig.at(i)->setChecked(false);
-            btnsConfig.at(i)->setIcon(QIcon(IconHelper::Instance()->getPixmap(btnsConfig.at(i), true)));
-        }
-    }
-
-//    ui->lab2->setText(name);
 }
 
 void UIDemo08::on_btnMenu_Min_clicked()     //设置最小化的槽函数
@@ -215,4 +127,104 @@ void UIDemo08::on_btnMenu_Close_clicked()   //设置关闭的槽函数
 {
     close();
 }
+void UIDemo08::do_page1()   //设置兵器界面的内容
+{
+    QHBoxLayout* layout=new QHBoxLayout(ui->frame);
+    layout->addWidget(search_1=new QWidget,1);
+    layout->addWidget(show_1=new QWidget,3);
+    show_1->setAutoFillBackground(true);
+    show_1->setPalette(QPalette(QColor(Qt::white)));
 
+    QVBoxLayout* vlayout=new QVBoxLayout(search_1);
+    QHBoxLayout* hlayout=new QHBoxLayout;
+    vlayout->addLayout(hlayout);
+    //添加查找框
+    QPushButton* button;
+    hlayout->addWidget(filter=new QLineEdit);
+    hlayout->addWidget(button=new QPushButton("点击查询"));
+    filter->setFont(QFont("Microsoft Yahei" , 28 ,  QFont::Black));
+    //鼠标点击时查询数据库
+    connect(button,&QPushButton::clicked,[&](bool)
+    {
+        qDebug()<<"clicked";
+    });
+    //设置样式
+//    button->setStyleSheet("QPushButton{color:red;background:yellow}");
+//    QFont* font=new QFont("QFont{color:red;}");
+//    filter->setFont(*font);
+    //加载数据库模型
+    _model=new QSqlQueryModel;
+    _model->setQuery("select * from weapon;");
+    QSqlQuery query=_model->query();
+    _view=new QTableView;
+    _view->setModel(_model);
+    //获取要显示的数据的列坐标
+    int index_name=query.record().indexOf("name");
+    int index_country=query.record().indexOf("country");
+    int index_kind=query.record().indexOf("kind");
+    //获取不显示的数据的列坐标
+    int index_img=query.record().indexOf("img");
+    int index_introduce=query.record().indexOf("introduce");
+    int index_html=query.record().indexOf("html");
+    //更改显示的标题
+    _model->setHeaderData(index_name,Qt::Horizontal,"名称");
+    _model->setHeaderData(index_country,Qt::Horizontal,"生产国");
+    _model->setHeaderData(index_kind,Qt::Horizontal,"类型");
+    _view->hideColumn(index_img);
+    _view->hideColumn(index_introduce);
+    _view->hideColumn(index_html);
+    _view->setBackgroundRole(QPalette::ColorRole::Light);
+
+    vlayout->addWidget(_view);
+
+    //设置显示界面相关显示
+    QHBoxLayout* hlayout_2=new QHBoxLayout(show_1);
+    QTextEdit* html_1;      //介绍页面的html文本显示框
+    QTextEdit* html_2;      //格子页面的html文本显示框
+    hlayout_2->addWidget(html_1=new QTextEdit,2);
+    hlayout_2->addWidget(html_2=new QTextEdit,1);
+    html_1->setBackgroundRole(QPalette::ColorRole::Text);
+    html_2->setBackgroundRole(QPalette::ColorRole::Light);
+}
+void UIDemo08::do_page2()  //进入舰船战机显示界面
+{
+    QHBoxLayout* layout=new QHBoxLayout(ui->frame_2);
+    layout->addWidget(search_2=new QWidget,1);
+    layout->addWidget(show_2=new QWidget,3);
+    show_2->setAutoFillBackground(true);
+    show_2->setPalette(QPalette(QColor(Qt::white)));
+
+}
+void UIDemo08::do_page3()   //进入战史战例显示界面
+{
+    QVBoxLayout* layout=new QVBoxLayout(ui->frame_3);
+    layout->addWidget(new QLabel("test"));
+}
+void UIDemo08::do_page4()   //进入军事论坛显示界面
+{
+    QVBoxLayout* layout=new QVBoxLayout(ui->frame_4);
+    layout->addWidget(new QLabel("test"));
+}
+void UIDemo08::slotshowresult(bool)     //兵器查询页面点击查询按钮时的槽函数
+{
+    QString filter_text=filter->text();
+    //如果未输入内容查询则提示
+    if(filter_text.isEmpty())
+    {
+        QMessageBox::warning(nullptr,"warn","输入的查询内容为空");
+    }
+    //更新数据库，显示查询内容
+    QSqlRecord record=_model->record();
+    QString queryfilter;
+    //拼凑查询内容
+    for(int i=0;i<record.count();i++)
+    {
+        if(i!=0) queryfilter+=" or ";
+        QString field=record.fieldName(i);
+        QString subfilter=QString().sprintf("%s like '%%%s%%'",field.toUtf8().data(),filter_text.toUtf8().data());
+        queryfilter+=subfilter;
+    }
+    qDebug()<<queryfilter;
+    _model->setQuery(queryfilter);
+    _model->query();
+}

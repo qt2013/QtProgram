@@ -119,7 +119,9 @@ background:qlineargradient(spread:pad,x1:0,y1:0,x2:0,y2:1,stop:0 #646464,stop:1 
 .QPushButton:pressed,.QToolButton:pressed{
 background:qlineargradient(spread:pad,x1:0,y1:0,x2:0,y2:1,stop:0 #484848,stop:1 #383838);
 }
-
+.QPushButton:default {
+border-color: navy; /* 使得按钮显示变得更加突出 */
+}
 .QToolButton::menu-indicator{
 image:None;
 }

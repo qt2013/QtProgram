@@ -17,9 +17,7 @@ public:
     UIDemo08* mainwindow;
 private slots:
     void on_pushButton_clicked();   //点击登录框的槽函数
-
     void on_pushButton_2_clicked();     //点击注册框的槽函数
-
 private:
     Ui::LogWindow *ui;
 };

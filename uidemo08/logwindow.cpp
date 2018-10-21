@@ -12,6 +12,7 @@ LogWindow::LogWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->label_3->setPixmap(QPixmap(":/png/log.png"));   //添加资源文件
+    ui->lineEdit_2->setEchoMode(QLineEdit::Password);
 
 //    connect(this,SIGNAL(close()),mainwindow,SLOT(showmain()));
 }

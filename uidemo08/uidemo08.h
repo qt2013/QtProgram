@@ -2,6 +2,8 @@
 #define UIDEMO08_H
 #include <QWidget>
 #include <QDebug>
+#include <QSqlQueryModel>
+#include <QTableView>
 class QToolButton;
 
 namespace Ui {
@@ -30,14 +32,23 @@ private:
     QList<int> pixCharConfig;
     QList<QToolButton *> btnsConfig;    //用来存储舰船战机页面中左侧的六个按钮
 
+    QWidget* search_1;  //兵器知识显示界面中的查询窗口
+    QWidget* show_1;    //兵器知识显示界面中的显示结果窗口
+    QWidget* search_2;  //舰船战机显示界面中的查询窗口
+    QWidget* show_2;    //舰船战机显示界面中的显示结果窗口
+
+    void do_page1();    //进入兵器知识显示界面
+    void do_page2();    //进入舰船战机显示界面
+    void do_page3();    //进入战史战例显示界面
+    void do_page4();    //进入军事论坛显示界面
+
+    QLineEdit* filter;  //兵器页面查询框
+    QSqlQueryModel* _model;
+    QTableView* _view;
 private slots:
     void initForm();
     void buttonClick();
-    void initLeftMain();
-    void initLeftConfig();
-    void leftMainClick();
-    void leftConfigClick();
-
+    void slotshowresult(bool);
 private slots:
     void on_btnMenu_Min_clicked();
     void on_btnMenu_Max_clicked();
