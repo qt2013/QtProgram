@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        QMessageBox::critical(nullptr,"error",db.lastError().text());   //链接失败，显示错误信息
+        QMessageBox::critical(nullptr,"error","网络异常，请稍后再试!");   //链接失败，显示错误信息
         exit(0);
     }
 #if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
