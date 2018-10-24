@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/html">
+        <file>second_bar.txt</file>
+        <file>second_bar_1.txt</file>
+        <file>second_bar_2.txt</file>
+        <file>second_bar_3.txt</file>
+        <file>first_bar.txt</file>
+        <file>first_bar_2.txt</file>
+        <file>fisrt_bar_3.txt</file>
+        <file>first_bar1.txt</file>
+    </qresource>
+</RCC>

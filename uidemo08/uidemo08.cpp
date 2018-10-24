@@ -3,6 +3,7 @@
 #include "uidemo08.h"
 #include "ui_uidemo08.h"
 #include "iconhelper.h"
+#include "qnavigationwidget.h"
 #include <QLabel>
 #include <QColor>
 #include <QSqlQueryModel>
@@ -12,6 +13,8 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QMessageBox>
+#include <QGridLayout>
+#include <QFile>
 
 UIDemo08::UIDemo08(QWidget *parent) :
     QWidget(parent),
@@ -98,6 +101,7 @@ void UIDemo08::buttonClick()    //设置菜单按钮的槽函数
         ui->stackedWidget->setCurrentIndex(1);
     } else if (name == "战史战例") {
         ui->stackedWidget->setCurrentIndex(2);
+        show_info_0();
     } else if (name == "军事论坛") {
         ui->stackedWidget->setCurrentIndex(3);
     } else if (name == "用户退出") {
@@ -148,7 +152,7 @@ void UIDemo08::init_page1()   //设置兵器界面的内容
     hlayout->addWidget(filter=new QLineEdit);
     //设置filter样式
     filter->setStyleSheet("QLineEdit{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid gray;}"
-            "QLineEdit:hover{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid rgb(70,200,50);}");
+                          "QLineEdit:hover{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid rgb(70,200,50);}");
     //设置过滤器，当filter中的编辑数据变化时，view显示包含edit中的数据的行
     connect(filter,SIGNAL(textChanged(const QString &)),this,SLOT(slottextChanged(const QString &)));
     //设置样式
@@ -211,7 +215,7 @@ void UIDemo08::init_page2()  //进入舰船战机显示界面
     hlayout->addWidget(filter_2=new QLineEdit);
     //设置filter_2样式
     filter_2->setStyleSheet("QLineEdit{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid gray;}"
-            "QLineEdit:hover{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid rgb(70,200,50);}");
+                            "QLineEdit:hover{border-width:1px;border-radius:4px;font-size:12px;color:black;border:1px solid rgb(70,200,50);}");
     //设置过滤器，当filter中的编辑数据变化时，view显示包含edit中的数据的行
     connect(filter_2,SIGNAL(textChanged(const QString &)),this,SLOT(slottextChanged_2(const QString &)));
     //设置样式
@@ -258,8 +262,63 @@ void UIDemo08::init_page2()  //进入舰船战机显示界面
 }
 void UIDemo08::init_page3()   //进入战史战例显示界面
 {
-    QVBoxLayout* layout=new QVBoxLayout(ui->frame_3);
-    layout->addWidget(new QLabel("test"));
+    QHBoxLayout* hlayout=new QHBoxLayout(ui->frame_3);
+    QWidget* mainWidget = new QWidget;
+    QWidget* rightWidget = new QWidget;
+    hlayout->addWidget(rightWidget,1);
+    hlayout->addWidget(mainWidget,6);
+    navigationWidget = new QNavigationWidget;
+    QVBoxLayout* rightLayout = new QVBoxLayout(rightWidget);
+    QHBoxLayout* mainLayout = new QHBoxLayout(mainWidget);
+
+    //添加左侧按钮
+    navigationWidget->setRowHeight(25);
+    navigationWidget->addItem("二战军史");
+    navigationWidget->addItem("一战军史");
+    navigationWidget->addItem("抗日战争");
+    navigationWidget->addItem("解放战争");
+    navigationWidget->setBackgroundColor("gray");
+    QPalette pal(mainWidget->palette());
+
+    //设置显示界面相关显示
+    text=new QTextEdit;
+    chart_widget=new QWidget;
+    mainLayout->addWidget(text,1);
+    mainLayout->addWidget(chart_widget,1);
+    //设置edittext背景颜色
+    text->setStyleSheet("background-color:lightgray;");
+    chart_widget->setStyleSheet("background-color:white");
+    //设置介绍界面的显示字体颜色
+    text->setTextColor(Qt::black);
+    //将显示界面设置为不可编辑
+    text->setFocusPolicy(Qt::NoFocus);
+    //设置背景白色
+    pal.setColor(QPalette::Background, Qt::white);
+    mainWidget->setAutoFillBackground(true);
+    mainWidget->setPalette(pal);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->addWidget(navigationWidget,2);
+
+    connect(navigationWidget, &QNavigationWidget::currentItemChanged, this, [=](const int &current){
+        if(current==0)
+        {
+            //显示二战信息
+            show_info_0();
+        }
+        if(current==1)
+        {
+            //显示一战信息
+            show_info_1();
+        }
+        if(current==2)
+        {
+
+        }
+        if(current==3)
+        {
+
+        }
+    });
 }
 void UIDemo08::init_page4()   //进入军事论坛显示界面
 {
@@ -321,4 +380,190 @@ void UIDemo08::slotshowresult_2()   //设置舰船战机界面的结果显示的
 {
     html_3->setText(_introduce_2);
     html_4->setText(_html_2);
+}
+void UIDemo08::show_info_0()
+{
+    //清空text显示界面和chart_widget显示界面
+    text->clear();
+    qDeleteAll(chart_widget->children());
+    QTextCodec *codec=QTextCodec::codecForName("GB2312");
+    //添加图片和html文本
+    QFile file(":/html/second_bar.txt");
+    QString text_html;
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    while(!file.atEnd()) {
+        QByteArray line = file.readLine();
+        text_html+=line;
+    }
+    text->append("<img src=':/png/images.jpg' height='200' width='573' ></img>");
+    text->append(text_html);
+    QFile file_1(":/html/second_bar_1.txt");
+    QString text_html_1;
+    if(!file_1.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file_1.atEnd())
+        {
+          text_html_1+=codec->toUnicode(file_1.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_1.jpg' height='200' width='573' ></img>");
+    text->append(text_html_1);
+    QFile file_2(":/html/second_bar_2.txt");
+    QString text_html_2;
+    if(!file_2.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file_2.atEnd())
+        {
+          text_html_2+=codec->toUnicode(file_2.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_2.jpg' height='200' width='573' ></img>");
+    text->append(text_html_2);
+    QFile file_3(":/html/second_bar_3.txt");
+    QString text_html_3;
+    if(!file_3.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file_3.atEnd())
+        {
+          text_html_3+=codec->toUnicode(file_3.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_3.jpg' height='200' width='573' ></img>");
+    text->append(text_html_3);
+    //更新右侧图表窗口
+    //设置右侧条形图
+    QVBoxLayout* hlayout=new QVBoxLayout(chart_widget);
+    QBarSet *set0 = new QBarSet("军事人员死伤");
+    QBarSet *set1 = new QBarSet("平民死伤");
+    QBarSet *set2 = new QBarSet("总死伤人数");
+
+    *set0 << 5530000 << 10700000 << 4000000 <<  2300000 << 416800 << 383800;
+    *set1 << 3150000 << 14600000 << 16000000 << 1000000 << 1700 << 67100;
+    *set2 << 8680000 << 23400000 << 20000000 << 3120000 << 418500 << 450900;
+
+    QBarSeries *series = new QBarSeries();
+    series->append(set0);
+    series->append(set1);
+    series->append(set2);
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("主要参战国军民死伤人数");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QStringList categories;
+    categories << "德国" << "苏联" << "中国" << "日本" << "美国" << "英国";
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(categories);
+    chart->createDefaultAxes();
+    chart->setAxisX(axis, series);
+
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    hlayout->addWidget(chartView,1);
+    //设置右侧饼图
+    QPieSeries *series_1 = new QPieSeries();
+    series_1->append("同盟国平民 58%", 58);
+    series_1->append("轴心国平民 4%", 4);
+    series_1->append("同盟国军人 25%", 25);
+    series_1->append("轴心国军人 3%", 3);
+
+    for(int i=0;i<4;i++)
+    {
+        Qt::GlobalColor temp_color[4]={Qt::blue,Qt::yellow,Qt::red,Qt::green};
+        QPieSlice *slice = series_1->slices().at(i);
+        slice->setLabelVisible();
+        slice->setPen(QPen(Qt::darkGreen, 2));
+        slice->setBrush(temp_color[i]);
+    }
+
+
+    QChart *chart_1 = new QChart();
+    chart_1->addSeries(series_1);
+    chart_1->setTitle("同盟国与轴心国死伤对比");
+    chart_1->legend()->hide();
+
+    QChartView *chartView_1 = new QChartView(chart_1);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    hlayout->addWidget(chartView_1,1);
+}
+void UIDemo08::show_info_1()
+{
+    //清空text显示界面和chart_widget显示界面
+    text->clear();
+    qDeleteAll(chart_widget->children());
+    QTextCodec *codec=QTextCodec::codecForName("GB2312");
+    //添加图片和html文本
+    QFile file(":/html/first_bar.txt");
+    QString text_html;
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file.atEnd())
+        {
+          text_html+=codec->toUnicode(file.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_4.jpg' height='200' width='573' ></img>");
+    text->append(text_html);
+    QFile file_1(":/html/first_bar1.txt");
+    QString text_html_1;
+    if(!file_1.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file_1.atEnd())
+        {
+          text_html_1+=codec->toUnicode(file_1.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_5.jpg' height='200' width='573' ></img>");
+    text->append(text_html_1);
+    QFile file_2(":/html/first_bar_2.txt");
+    QString text_html_2;
+    if(!file_2.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file_2.atEnd())
+        {
+          text_html_2+=codec->toUnicode(file_2.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_6.jpg' height='200' width='573' ></img>");
+    text->append(text_html_2);
+    QFile file_3(":/html/fisrt_bar_3.txt");
+    QString text_html_3;
+    if(!file_3.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Can't open the file!"<<endl;
+    }
+    else
+    {
+        while(!file_3.atEnd())
+        {
+          text_html_3+=codec->toUnicode(file_3.readLine());
+        }
+    }
+    text->append("<img src=':/png/images_7.jpg' height='200' width='573' ></img>");
+    text->append(text_html_3);
+    //设置右侧图表显示框
 }

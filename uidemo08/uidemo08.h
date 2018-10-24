@@ -5,6 +5,9 @@
 #include <QSqlQueryModel>
 #include <QTableView>
 #include <QTextEdit>
+#include "qnavigationwidget.h"
+#include <QtCharts>
+using namespace QtCharts;
 class QToolButton;
 
 namespace Ui {
@@ -57,6 +60,11 @@ private:
     QString _html;    //暂存兵器界面的查询结果中的html文本
     QString _introduce_2;    //暂存舰船战机界面的查询结果中的兵器介绍文本
     QString _html_2;    //暂存舰船战机界面的查询结果中的html文本
+    QNavigationWidget* navigationWidget;
+    QTextEdit* text;    //军事军例页面介绍文本
+    QWidget* chart_widget;  //军事军例图表显示界面
+    void show_info_0();     //显示二战相关信息
+    void show_info_1();     //显示一战相关信息
 signals:
     void showresult_1();  //设置显示兵器界面查询结果的信号函数
     void showresult_2();  //设置显示舰船战机界面查询结果的信号函数
